@@ -1,0 +1,16 @@
+__pycache__
+.envrc
+
+# Build artifacts
+/_build/
+/deps/
+*.ez
+
+# Escript binary
+/power_monitor
+
+# Elixir LS
+/.elixir_ls/
+
+# macOS
+.DS_Store
