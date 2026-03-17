@@ -29,5 +29,6 @@ The URL is hardcoded in `lib/power_monitor.ex` as `@url`. Change it there before
 
 - [ ] Make the inverter vendor configurable
 - [ ] Setup for Nerves project
+- [ ] Add unit tests
 
 
