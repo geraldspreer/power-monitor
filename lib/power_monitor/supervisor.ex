@@ -10,7 +10,11 @@ defmodule PowerMonitor.Supervisor do
   def init(args) do
     children = [
       {PowerMonitor.UIDisplay, [name: PowerMonitor.UIDisplay]},
-      {PowerMonitor.DataFetcher, [name: PowerMonitor.DataFetcher, ui_server: PowerMonitor.UIDisplay] ++ args}
+      {PowerMonitor.DataFetcher,
+       [
+         name: PowerMonitor.DataFetcher,
+         ui_server: PowerMonitor.UIDisplay
+       ] ++ args}
     ]
 
     Supervisor.init(children, strategy: :rest_for_one)

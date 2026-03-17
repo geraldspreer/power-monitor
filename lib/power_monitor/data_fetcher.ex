@@ -48,7 +48,7 @@ defmodule PowerMonitor.DataFetcher do
       PowerMonitor.UIDisplay.display_data(state.ui_server, data, state.debug)
     end
 
-    delay = if state.testing, do: 1_000, else: @reload_after * 1_000
+    delay = if state.testing, do: 250, else: @reload_after * 1_000
     schedule_fetch(delay)
 
     {:noreply, new_state}
@@ -88,10 +88,19 @@ defmodule PowerMonitor.DataFetcher do
     end)
   end
 
-  defp format_error(term), do: inspect(term)
+  defp format_error(error_message) do
+    {:ok, {{_, 400, _}, _, body}} = error_message
+
+    message =
+      body
+      |> Jason.decode!()
+      |> Map.get("failure")
+
+    inspect(message)
+  end
 
   defp test_data(%{test_step: step} = state) do
-    new_step = if step >= 9, do: 0, else: step + 1
+    new_step = if step >= 10, do: 0, else: step + 1
     {make_data_set(new_step), %{state | test_step: new_step}}
   end
 
@@ -99,8 +108,8 @@ defmodule PowerMonitor.DataFetcher do
     %{
       "site" => %{
         "rel_Autonomy" => value * 10,
-        "P_PV"         => value * 1000,
-        "P_Grid"       => value * 1000
+        "P_PV" => value * 1000,
+        "P_Grid" => value * 1000
       },
       "inverters" => [%{"SOC" => value * 10, "P" => value * 1000}]
     }
