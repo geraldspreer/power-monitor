@@ -1,15 +1,19 @@
 defmodule PowerMonitor.UIDisplay do
   @moduledoc "GenServer for terminal UI display."
   use GenServer
-  require Logger
 
   @red "\e[38;5;166m"
   @reset "\e[0m"
   @empty "\e[38;5;238m█ \e[0m"
   @block "█ "
 
+  # 10 blocks of red
   @buying_colors List.duplicate(1, 10)
+
+  # 10 blocks of green
   @benefit_colors List.duplicate(2, 10)
+
+  # 8 blocks of green, 1 yellow, 1 red
   @consumption_colors List.duplicate(2, 8) ++ [3, 1]
   @performance_colors Enum.reverse(@consumption_colors)
 
@@ -35,7 +39,9 @@ defmodule PowerMonitor.UIDisplay do
   end
 
   def display_data(server, data, debug \\ false) do
-    GenServer.call(server, {:display_data, data, debug})
+    if data do
+      GenServer.call(server, {:display_data, data, debug})
+    end
   end
 
   def display_error(server, reason) do
@@ -47,7 +53,7 @@ defmodule PowerMonitor.UIDisplay do
   end
 
   @impl true
-  def handle_call({:display_data, data, debug}, _from, state) do
+  def handle_call({:display_data, data, debug}, _, state) do
     state = %{state | debug: debug}
     render_values(state, data)
     {:reply, :ok, state}
@@ -63,7 +69,7 @@ defmodule PowerMonitor.UIDisplay do
 
   @impl true
   def handle_cast({:show_countdown, seconds}, state) do
-    MiniUI.label(state.ui, "Retry in #{seconds} seconds" <> String.duplicate(" ", 20), 0, 2)
+    MiniUI.label(state.ui, "Retrying in #{seconds} seconds" <> String.duplicate(" ", 20), 0, 2)
     MiniUI.goto(state.ui, 20, 2)
     {:noreply, state}
   end

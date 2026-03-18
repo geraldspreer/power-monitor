@@ -1,7 +1,6 @@
 defmodule PowerMonitor.DataFetcher do
   @moduledoc "GenServer for fetching solar inverter data."
   use GenServer
-  require Logger
 
   @reload_after 10
   @inverter_url "http://192.168.178.53/status/powerflow"
@@ -23,7 +22,8 @@ defmodule PowerMonitor.DataFetcher do
       url: @inverter_url,
       testing: testing,
       debug: debug,
-      test_step: -1 # Begin with -1 so the first test data set starts at 0
+      # Begin with -1 so the first test data set starts at 0
+      test_step: -1
     }
 
     delay = if state.testing, do: 1_000, else: 0
@@ -33,21 +33,23 @@ defmodule PowerMonitor.DataFetcher do
   end
 
   @impl true
+  def handle_info(:fetch_data, %{testing: true} = state) do
+    {data, new_state} = test_data(state)
+    PowerMonitor.UIDisplay.display_data(state.ui_server, data, state.debug)
+
+    schedule_fetch(250)
+
+    {:noreply, new_state}
+  end
+
   def handle_info(:fetch_data, state) do
-    {data, new_state} =
-      if state.testing do
-        # TODO: Here change the url to the test server if implemented
-        test_data(state)
-      else
-        {get_data(state), state}
-      end
+    {data, new_state} = {get_data(state), state}
 
     if data do
       PowerMonitor.UIDisplay.display_data(state.ui_server, data, state.debug)
     end
 
-    delay = if state.testing, do: 250, else: @reload_after * 1_000
-    schedule_fetch(delay)
+    schedule_fetch(@reload_after * 1_000)
 
     {:noreply, new_state}
   end
@@ -65,12 +67,9 @@ defmodule PowerMonitor.DataFetcher do
 
       other ->
         handle_network_error(state, format_error(other))
-        nil
     end
   rescue
-    e ->
-      handle_network_error(state, Exception.message(e))
-      nil
+    e -> handle_network_error(state, Exception.message(e))
   end
 
   defp handle_network_error(state, reason) do
