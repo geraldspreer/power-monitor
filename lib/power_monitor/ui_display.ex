@@ -1,5 +1,6 @@
 defmodule PowerMonitor.UIDisplay do
   @moduledoc "GenServer for terminal UI display."
+
   use GenServer
 
   @red "\e[38;5;166m"
@@ -72,47 +73,23 @@ defmodule PowerMonitor.UIDisplay do
   end
 
   defp render_values(state, data) when is_map(data) do
-    show_level(
-      state,
-      to_int(data["site"]["rel_Autonomy"]),
-      16,
-      0,
-      10,
-      @performance_colors,
-      "Autonomy"
-    )
-
-    show_level(
-      state,
-      to_int(hd(data["inverters"])["SOC"]),
-      16,
-      3,
-      10,
-      @performance_colors,
-      "Battery"
-    )
-
-    show_level(
-      state,
-      to_int(hd(data["inverters"])["P"]),
-      16,
-      5,
-      1000,
-      @consumption_colors,
-      "Consumption"
-    )
-
-    show_level(state, to_int(data["site"]["P_PV"]), 16, 7, 1000, @benefit_colors, "Solar")
-
+    autonomy = to_int(data["site"]["rel_Autonomy"])
+    battery = to_int(hd(data["inverters"])["SOC"])
+    consumption = to_int(hd(data["inverters"])["P"])
     grid_value = to_int(data["site"]["P_Grid"])
+    solar = to_int(data["site"]["P_PV"])
+
+    show_level(state, autonomy, 16, 0, 10, @performance_colors, "Autonomy")
+    show_level(state, battery, 16, 3, 10, @performance_colors, "Battery")
+    show_level(state, consumption, 16, 5, 1000, @consumption_colors, "Consumption")
+    show_level(state, solar, 16, 7, 1000, @benefit_colors, "Solar")
+
     colors = if grid_value < 0, do: @benefit_colors, else: @buying_colors
     label = if grid_value < 0, do: "Export", else: "Import"
     grid = if abs(grid_value) < 100, do: 0, else: abs(grid_value)
 
     show_level(state, grid, 16, 9, 1000, colors, label)
   end
-
-  defp render_values(_state, _data), do: :ok
 
   defp show_level(state, value, x, y, divider, colors, label) do
     MiniUI.label(label, 0, y)
