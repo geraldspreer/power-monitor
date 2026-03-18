@@ -4,7 +4,7 @@ defmodule PowerMonitor.DataFetcher do
   require Logger
 
   @reload_after 10
-  @default_url "http://192.168.178.53/status/powerflow"
+  @inverter_url "http://192.168.178.53/status/powerflow"
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
@@ -12,11 +12,11 @@ defmodule PowerMonitor.DataFetcher do
 
   @impl true
   def init(opts) do
-    name = Keyword.get(opts, :name, __MODULE__)
-    ui_server = Keyword.fetch!(opts, :ui_server)
-    testing = Keyword.get(opts, :testing, false)
     debug = Keyword.get(opts, :debug, false)
-    url = Keyword.get(opts, :url, @default_url)
+    name = Keyword.get(opts, :name, __MODULE__)
+    testing = Keyword.get(opts, :testing, false)
+    ui_server = Keyword.fetch!(opts, :ui_server)
+    url = Keyword.get(opts, :url, @inverter_url)
 
     :inets.start()
 

@@ -26,7 +26,7 @@ defmodule PowerMonitor.UIDisplay do
       |> MiniUI.clear()
       |> MiniUI.set_padding(2, 1)
 
-    MiniUI.hide_cursor()
+   # MiniUI.hide_cursor()
 
     state = %{
       name: name,
