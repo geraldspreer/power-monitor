@@ -13,20 +13,17 @@ defmodule PowerMonitor.DataFetcher do
   @impl true
   def init(opts) do
     debug = Keyword.get(opts, :debug, false)
-    name = Keyword.get(opts, :name, __MODULE__)
     testing = Keyword.get(opts, :testing, false)
     ui_server = Keyword.fetch!(opts, :ui_server)
-    url = Keyword.get(opts, :url, @inverter_url)
 
     :inets.start()
 
     state = %{
-      name: name,
       ui_server: ui_server,
-      url: url,
+      url: @inverter_url,
       testing: testing,
       debug: debug,
-      test_step: -1
+      test_step: -1 # Begin with -1 so the first test data set starts at 0
     }
 
     delay = if state.testing, do: 1_000, else: 0
@@ -39,6 +36,7 @@ defmodule PowerMonitor.DataFetcher do
   def handle_info(:fetch_data, state) do
     {data, new_state} =
       if state.testing do
+        # TODO: Here change the url to the test server if implemented
         test_data(state)
       else
         {get_data(state), state}
