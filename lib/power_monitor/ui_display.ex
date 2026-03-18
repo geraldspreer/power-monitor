@@ -23,15 +23,11 @@ defmodule PowerMonitor.UIDisplay do
 
   @impl true
   def init(_) do
-    ui =
-      MiniUI.new()
-      |> MiniUI.clear()
-      |> MiniUI.set_padding(2, 1)
-
-    # MiniUI.hide_cursor()
+    # Clear the terminal on start
+    MiniUI.clear()
 
     state = %{
-      ui: ui,
+      ui: MiniUI.new(),
       debug: false
     }
 
@@ -61,16 +57,17 @@ defmodule PowerMonitor.UIDisplay do
 
   @impl true
   def handle_cast({:display_error, reason}, state) do
-    MiniUI.clear(state.ui)
-    MiniUI.home(state.ui)
+    MiniUI.clear()
+    MiniUI.home()
+
     IO.write([@red, "Network Error:\n", reason, @reset, "\n"])
     {:noreply, state}
   end
 
   @impl true
   def handle_cast({:show_countdown, seconds}, state) do
-    MiniUI.label(state.ui, "Retrying in #{seconds} seconds" <> String.duplicate(" ", 20), 0, 2)
-    MiniUI.goto(state.ui, 20, 2)
+    MiniUI.label("Retrying in #{seconds} seconds" <> String.duplicate(" ", 20), 0, 2)
+    MiniUI.goto(20, 2)
     {:noreply, state}
   end
 
@@ -118,8 +115,8 @@ defmodule PowerMonitor.UIDisplay do
   defp render_values(_state, _data), do: :ok
 
   defp show_level(state, value, x, y, divider, colors, label) do
-    MiniUI.label(state.ui, label, 0, y)
-    MiniUI.goto(state.ui, x, y)
+    MiniUI.label(label, 0, y)
+    MiniUI.goto(x, y)
 
     Enum.each(0..9, fn p ->
       if p < value / divider do
@@ -130,7 +127,7 @@ defmodule PowerMonitor.UIDisplay do
     end)
 
     if state.debug, do: IO.write(" #{value}    ")
-    MiniUI.goto(state.ui, state.ui.cols, state.ui.rows)
+    MiniUI.goto(state.ui.cols, state.ui.rows)
   end
 
   defp to_int(v) when is_float(v), do: trunc(v)
