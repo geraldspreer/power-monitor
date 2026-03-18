@@ -28,6 +28,8 @@ The URL is hardcoded in `lib/power_monitor.ex` as `@url`. Change it there before
 ### TODO
 
 - [ ] Make the inverter vendor configurable
+- [ ] Make this idiomatic Elixir, use message passing, like instead of using the `--test` parameter, send `.test` message to the runtime to enable **test mode**
+- [ ] Instead of generating the test values, run a webserver with a test endpoint that provides the values
 - [ ] Setup for Nerves project
 - [ ] Add unit tests
 
