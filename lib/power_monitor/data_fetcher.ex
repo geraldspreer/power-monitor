@@ -14,15 +14,15 @@ defmodule PowerMonitor.DataFetcher do
     debug = Keyword.get(opts, :debug, false)
     testing = Keyword.get(opts, :testing, false)
     ui_server = Keyword.fetch!(opts, :ui_server)
+    url = Keyword.get(opts, :url, @inverter_url)
 
     :inets.start()
 
     state = %{
       ui_server: ui_server,
-      url: @inverter_url,
+      url: url,
       testing: testing,
       debug: debug,
-      # Begin with -1 so the first test data set starts at 0
       test_step: -1
     }
 

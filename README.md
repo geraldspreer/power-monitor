@@ -18,12 +18,12 @@ This produces a standalone `./power_monitor` escript.
 ### Run
 
 ```sh
-./power_monitor              # Connect to inverter at 192.168.178.53
+./power_monitor              # Run the application
 ./power_monitor --test       # Cycle through test data (no network needed)
 ./power_monitor --debug      # Show raw values next to each bar
 ```
 
-The URL is hardcoded in `lib/power_monitor.ex` as `@url`. Change it there before building.
+The inverter URL is hardcoded in `lib/power_monitor/data_fetcher.ex` as `@inverter_url`. Change it there before building.
 
 ### TODO
 

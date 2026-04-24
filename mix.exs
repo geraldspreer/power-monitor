@@ -17,6 +17,9 @@ defmodule PowerMonitor.MixProject do
   end
 
   defp deps do
-    [{:jason, "~> 1.4"}]
+    [
+      {:jason, "~> 1.4"},
+      {:plug_cowboy, "~> 2.6"}
+    ]
   end
 end
